@@ -1,0 +1,1179 @@
+
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Goethe A1 — Kelime Antrenörü</title>
+<style>
+:root{
+  --bg:#F7F3EE;--bg2:#EDE6DC;--ink:#1E1B26;--ink2:#5A5468;
+  --plum:#7C4D8A;--plum2:#5E3469;--plum3:#EAD9EE;
+  --gold:#B8862E;--ok:#3A7A53;--ok2:#D5EDE0;
+  --err:#B04A28;--err2:#F5E0D8;--line:#D8D0C6;--r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--ink);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;}
+.wrap{max-width:900px;margin:0 auto;padding:24px 16px 80px;}
+
+/* HEADER */
+header{border-bottom:2.5px solid var(--ink);padding-bottom:16px;margin-bottom:20px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.brand{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--plum2);font-weight:700;margin-bottom:6px;}
+h1{font-size:clamp(24px,5vw,38px);font-weight:800;letter-spacing:-.02em;line-height:1.05;}
+.sub{color:var(--ink2);font-size:13.5px;margin-top:6px;max-width:50ch;line-height:1.5;}
+.badge{flex-shrink:0;border:2.5px solid var(--plum);border-radius:50%;width:68px;height:68px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:9px;font-weight:700;color:var(--plum);letter-spacing:.06em;line-height:1.3;transform:rotate(-8deg);}
+
+/* DECKS */
+.deck-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:20px;}
+.deck-btn{background:#fff;border:1.5px solid var(--line);border-radius:var(--r);padding:11px 12px;text-align:left;cursor:pointer;font-family:inherit;transition:border-color .15s,transform .1s;}
+.deck-btn:hover{border-color:var(--plum);transform:translateY(-1px);}
+.deck-btn.active{border-color:var(--plum2);background:linear-gradient(135deg,#fff,var(--plum3));box-shadow:0 2px 0 var(--plum2);}
+.dn{font-weight:700;font-size:13px;display:block;}
+.dm{font-size:10px;color:var(--ink2);display:block;margin-top:4px;}
+.dp{height:3px;border-radius:2px;background:var(--bg2);margin-top:7px;overflow:hidden;}
+.dp span{display:block;height:100%;background:var(--ok);}
+
+/* MODE BAR */
+.modebar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;}
+.tab{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:8px 14px;border-radius:999px;border:1.5px solid var(--line);background:#fff;cursor:pointer;color:var(--ink2);}
+.tab.active{background:var(--ink);color:var(--bg);border-color:var(--ink);}
+.sstat{font-size:11.5px;color:var(--ink2);}
+.sstat b{color:var(--ink);}
+
+/* STAGE */
+#stage{min-height:340px;}
+
+/* FLASHCARD */
+.card-wrap{perspective:1200px;}
+.fc{position:relative;min-height:280px;cursor:pointer;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.8,.2,1);}
+.fc.flip{transform:rotateY(180deg);}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;border:1.5px solid var(--line);background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px 24px;box-shadow:0 12px 28px -16px rgba(30,27,38,.22);}
+.face.back{transform:rotateY(180deg);background:linear-gradient(150deg,#fff,var(--plum3));}
+.etag{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--plum);margin-bottom:12px;}
+.deword{font-size:clamp(28px,6vw,44px);font-weight:800;line-height:1.05;letter-spacing:-.01em;}
+.trword{font-size:clamp(22px,4.5vw,34px);font-weight:700;color:var(--plum2);margin-bottom:12px;}
+.ex{font-size:15px;color:var(--ink2);font-style:italic;max-width:40ch;line-height:1.55;}
+.hint{position:absolute;bottom:12px;font-size:10px;color:#C0B8CC;letter-spacing:.07em;text-transform:uppercase;}
+.box-badge{position:absolute;top:14px;right:14px;font-size:10px;font-weight:700;color:var(--plum);background:var(--plum3);border-radius:999px;padding:3px 8px;}
+
+/* CONTROLS */
+.ctrl{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap;}
+.btn{font-family:inherit;font-weight:700;font-size:14px;padding:12px 22px;border-radius:11px;border:none;cursor:pointer;transition:transform .1s,filter .12s;}
+.btn:active{transform:scale(.97);}
+.btn-no{background:var(--err2);color:var(--err);}
+.btn-yes{background:var(--ok2);color:var(--ok);}
+.btn-flip{background:var(--ink);color:var(--bg);}
+.btn-next{background:var(--ink);color:var(--bg);}
+
+/* QUIZ */
+.qbox{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:30px 24px;text-align:center;box-shadow:0 12px 28px -16px rgba(30,27,38,.18);}
+.qprompt{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--plum);margin-bottom:8px;}
+.qword{font-size:clamp(26px,5vw,38px);font-weight:800;letter-spacing:-.01em;margin-bottom:22px;}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+@media(max-width:500px){.opts{grid-template-columns:1fr;}}
+.opt{font-family:inherit;font-size:14.5px;font-weight:500;padding:13px 14px;border-radius:11px;border:1.5px solid var(--line);background:var(--bg);cursor:pointer;text-align:left;transition:border-color .12s;}
+.opt:hover:not(:disabled){border-color:var(--plum);}
+.opt.ok{background:var(--ok2);border-color:var(--ok);color:var(--ok);font-weight:700;}
+.opt.err{background:var(--err2);border-color:var(--err);color:var(--err);}
+.opt:disabled{cursor:default;}
+.qnext{margin-top:18px;}
+
+/* BLANK MODE */
+.blankbox{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:30px 24px;text-align:center;box-shadow:0 12px 28px -16px rgba(30,27,38,.18);}
+.bl-tag{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.bl-tr{font-size:18px;font-weight:700;color:var(--ink2);margin-bottom:6px;}
+.bl-sent{font-size:17px;font-style:italic;line-height:1.6;margin-bottom:22px;color:var(--ink);}
+.bl-sent b{color:var(--plum2);background:var(--plum3);border-radius:5px;padding:1px 6px;font-style:normal;}
+.blank-input{display:inline-block;min-width:120px;border-bottom:2.5px solid var(--plum);font-size:17px;font-weight:700;color:var(--plum2);font-style:normal;padding:2px 8px;}
+
+.empty{text-align:center;padding:50px 16px;color:var(--ink2);font-size:15px;}
+.prog{font-size:11px;color:var(--ink2);text-align:center;margin-top:14px;letter-spacing:.03em;}
+
+/* STATS BAR */
+.statsbar{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:16px;}
+.sbox{background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:8px 6px;text-align:center;}
+.sbox .sn{font-size:18px;font-weight:800;}
+.sbox .sl{font-size:10px;color:var(--ink2);margin-top:2px;}
+
+footer{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);font-size:11.5px;color:#B8B0C2;text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <div class="brand">Goethe-Zertifikat A1 · Start Deutsch 1</div>
+    <h1>Kelime Antrenörü</h1>
+    <p class="sub">808 kelime · Kartlar, Test ve Boşluk Doldurma modları · Bilmediğin kelimeler daha sık karşına çıkar (aralıklı tekrar)</p>
+  </div>
+  <div class="badge">GOETHE<br>A1<br>WORT<br>LISTE</div>
+</header>
+
+<div class="deck-grid" id="deckGrid"></div>
+
+<div class="modebar">
+  <div class="tabs">
+    <button class="tab active" data-m="flash">🃏 Kartlar</button>
+    <button class="tab" data-m="quiz">✅ Test</button>
+    <button class="tab" data-m="blank">✏️ Boşluk</button>
+  </div>
+  <div class="sstat" id="sstat"></div>
+</div>
+
+<div id="stage"></div>
+
+<div class="statsbar" id="statsbar"></div>
+
+<footer>Goethe-Institut · Start Deutsch 1 Wortliste · Tüm kelimeler PDF'den alınmıştır</footer>
+</div>
+
+<script>
+const DECKS=[
+{id:'zahlen',name:'Sayılar',tag:'Zahlen · Ordinal',words:[
+['eins','bir','Ich brauche nur eins.'],
+['zwei','iki','Wir haben zwei Kinder.'],
+['drei','üç','Drei Bananen, bitte!'],
+['vier','dört','Wir sind vier Personen.'],
+['fünf','beş','In fünf Minuten bin ich da.'],
+['sechs','altı','Der Zug kommt in sechs Minuten.'],
+['sieben','yedi','Wir warten noch sieben Tage.'],
+['acht','sekiz','Acht Personen, bitte.'],
+['neun','dokuz','Um neun Uhr beginnt der Kurs.'],
+['zehn','on','In zehn Minuten bin ich fertig.'],
+['elf','on bir','Es ist elf Uhr.'],
+['zwölf','on iki','Um zwölf essen wir zusammen.'],
+['dreizehn','on üç','Um dreizehn Uhr Mittagspause.'],
+['vierzehn','on dört','Der Zug fährt um vierzehn Uhr.'],
+['fünfzehn','on beş','Fünfzehn Minuten, bitte.'],
+['sechzehn','on altı','Er ist sechzehn Jahre alt.'],
+['siebzehn','on yedi','Um siebzehn Uhr ist Feierabend.'],
+['achtzehn','on sekiz','Mit achtzehn ist man erwachsen.'],
+['neunzehn','on dokuz','Es ist schon neunzehn Uhr.'],
+['zwanzig','yirmi','Zwanzig Euro, bitte.'],
+['einundzwanzig','yirmi bir','Er ist einundzwanzig Jahre alt.'],
+['dreißig','otuz','Dreißig Minuten Pause.'],
+['vierzig','kırk','Vierzig Euro kostet das.'],
+['fünfzig','elli','Fünfzig Prozent Rabatt!'],
+['sechzig','altmış','Sechzig Sekunden sind eine Minute.'],
+['siebzig','yetmiş','Meine Oma ist siebzig.'],
+['achtzig','seksen','Das Auto fährt achtzig Kilometer.'],
+['neunzig','doksan','Neunzig Prozent sind richtig.'],
+['(ein)hundert','yüz','Das kostet hundert Euro.'],
+['(ein)tausend','bin','Tausend Dank!'],
+['eine Million','bir milyon','Eine Million Euro!'],
+['der/die erste','birinci','Das ist der erste Tag.'],
+['der/die zweite','ikinci','Ich wohne im zweiten Stock.'],
+['der/die dritte','üçüncü','Das ist das dritte Mal.'],
+['der/die vierte','dördüncü','Am vierten April.'],
+['halb','yarım (saat)','Es ist halb drei.'],
+['ein Viertel','çeyrek','Ein Viertel nach sieben.'],
+['die Zahl','sayı / rakam','Schreiben Sie die Zahlen aus.'],
+]},
+{id:'zeit',name:'Zaman',tag:'Uhr · Tage · Monate · Jahreszeiten',words:[
+['die Sekunde','saniye','Eine Sekunde, bitte!'],
+['die Minute','dakika','In fünf Minuten bin ich da.'],
+['die Stunde','saat (süre)','Der Film dauert eine Stunde.'],
+['der Tag','gün','Heute ist ein schöner Tag.'],
+['die Woche','hafta','Nächste Woche habe ich Urlaub.'],
+['das Jahr','yıl','Das Jahr hat zwölf Monate.'],
+['der Wochentag','haftanın günü','Welcher Wochentag ist heute?'],
+['der Sonntag','pazar','Am Sonntag schlafe ich lange.'],
+['der Montag','pazartesi','Der Kurs beginnt am Montag.'],
+['der Dienstag','salı','Am Dienstag habe ich keine Zeit.'],
+['der Mittwoch','çarşamba','Mittwoch ist mein freier Tag.'],
+['der Donnerstag','perşembe','Wir treffen uns am Donnerstag.'],
+['der Freitag','cuma','Am Freitag gehen wir essen.'],
+['der Samstag','cumartesi','Samstag ist Markttag.'],
+['der Sonnabend','cumartesi (kuzey Almanya)','Am Sonnabend bin ich frei.'],
+['das Wochenende','hafta sonu','Was machst du am Wochenende?'],
+['der Morgen','sabah','Guten Morgen!'],
+['der Vormittag','öğleden önce','Ich arbeite am Vormittag.'],
+['der Mittag','öğle','Wir essen um Mittag zusammen.'],
+['der Nachmittag','öğleden sonra','Am Nachmittag bin ich zu Hause.'],
+['der Abend','akşam','Guten Abend!'],
+['die Nacht','gece','Gute Nacht!'],
+['der Januar','ocak','Im Januar ist es kalt.'],
+['der Februar','şubat','Der Februar ist kurz.'],
+['der März','mart','Im März beginnt der Frühling.'],
+['der April','nisan','Im April regnet es oft.'],
+['der Mai','mayıs','Im Mai blühen die Blumen.'],
+['der Juni','haziran','Im Juni ist Sommeranfang.'],
+['der Juli','temmuz','Im Juli machen wir Urlaub.'],
+['der August','ağustos','Im August ist es sehr heiß.'],
+['der September','eylül','Im September beginnt die Schule.'],
+['der Oktober','ekim','Im Oktober wird es kühl.'],
+['der November','kasım','Im November ist es grau.'],
+['der Dezember','aralık','Im Dezember feiern wir Weihnachten.'],
+['der Frühling','ilkbahar','Der Frühling ist meine Lieblingszeit.'],
+['das Frühjahr','ilkbahar (alternatif)','Im Frühjahr wird es wärmer.'],
+['der Sommer','yaz','Der Sommer ist sehr warm.'],
+['der Herbst','sonbahar','Im Herbst fallen die Blätter.'],
+['der Winter','kış','Der Winter ist kalt.'],
+['heute','bugün','Heute ist Montag.'],
+['morgen','yarın','Morgen habe ich frei.'],
+['gestern','dün','Gestern war ich krank.'],
+['früh','erken','Ich stehe früh auf.'],
+['bald','yakında','Ich komme bald.'],
+['später','daha sonra','Das können wir später machen.'],
+['immer','her zaman','Er kommt immer zu spät.'],
+['nie','hiçbir zaman','Er kommt nie pünktlich.'],
+['noch','henüz / hâlâ','Ich habe noch zwanzig Euro.'],
+['schon','zaten / artık','Ist das Essen schon fertig?'],
+['gleich','hemen şimdi','Ich komme gleich.'],
+['sofort','derhal','Bitte antworten Sie sofort.'],
+['seit','...den beri','Ich wohne seit drei Jahren hier.'],
+['bis','...e kadar','Ich warte bis morgen.'],
+['dann','sonra','Dann gehen wir essen.'],
+['jetzt','şimdi','Jetzt machen wir eine Pause.'],
+]},
+{id:'farben',name:'Renkler & Ölçüler',tag:'Farben · Richtungen · Maße',words:[
+['schwarz','siyah','Die Tasche ist schwarz.'],
+['weiß','beyaz','Er trägt ein weißes Hemd.'],
+['grau','gri','Der Himmel ist grau.'],
+['rot','kırmızı','Die Ampel ist rot.'],
+['blau','mavi','Das Meer ist blau.'],
+['gelb','sarı','Die Banane ist gelb.'],
+['grün','yeşil','Der Park ist grün.'],
+['braun','kahverengi','Der Tisch ist braun.'],
+['der Norden','kuzey','Hamburg liegt im Norden.'],
+['der Süden','güney','Im Süden ist es wärmer.'],
+['der Westen','batı','Die Sonne geht im Westen unter.'],
+['der Osten','doğu','Wir fahren in den Osten.'],
+['der Euro','avro','Das kostet zehn Euro.'],
+['der Cent','sent','Das macht fünfzig Cent.'],
+['der Meter','metre','Der Tisch ist zwei Meter lang.'],
+['der Kilometer','kilometre','Von hier sind es zehn Kilometer.'],
+['das Gramm','gram','Hundert Gramm Käse, bitte.'],
+['das Kilo','kilo','Ein Kilo Äpfel, bitte.'],
+['der Liter','litre','Einen Liter Wasser, bitte.'],
+['das Pfund','yarım kilo (500g)','Ein Pfund Tomaten, bitte.'],
+['der Grad','derece (sıcaklık)','Heute haben wir dreißig Grad.'],
+['das Prozent','yüzde','Fünfzig Prozent Rabatt.'],
+]},
+{id:'a',name:'A harfi',tag:'ab → automatisch',words:[
+['ab','itibaren / -dan','Ab morgen muss ich früh aufstehen.'],
+['aber','ama / fakat','Ich bin oft da, aber nur kurz.'],
+['abfahren','hareket etmek (araç)','Wann fährt der Zug ab?'],
+['die Abfahrt','kalkış (araç)','Vor der Abfahrt rufe ich an.'],
+['der Abflug','kalkış (uçak)','Der Abflug ist um 11.20 Uhr.'],
+['abfliegen','uçmakla kalkmak','Wann fliegst du ab?'],
+['abgeben','teslim etmek','Ich muss meine Schlüssel abgeben.'],
+['abholen','almaya gelmek','Ich hole dich vom Bahnhof ab.'],
+['der Absender','gönderen','Da ist ein Brief ohne Absender.'],
+['Achtung','dikkat!','Achtung! Das dürfen Sie nicht tun.'],
+['die Adresse','adres','Können Sie mir Ihre Adresse sagen?'],
+['alles','her şey','Alles Gute! Das ist alles.'],
+['alle','hepsi / herkesi','Sind alle da?'],
+['allein','yalnız / tek başına','Er kommt allein.'],
+['also','yani / öyleyse','Also, es ist so: ...'],
+['alt','yaşlı / eski','Wie alt sind Sie?'],
+['das Alter','yaş','Alter: 26 Jahre.'],
+['an','üzerinde / yanında','-An der Haltestelle warten.'],
+['anbieten','ikram etmek / teklif etmek','Was darf ich dir anbieten?'],
+['das Angebot','teklif / kampanya','Heute sind Schuhe im Angebot.'],
+['ander-','diğer / başka','Ich möchte die andere Jacke.'],
+['anfangen','başlamak','Der Unterricht fängt gleich an.'],
+['der Anfang','başlangıç','Sie wohnt am Anfang der Straße.'],
+['anklicken','tıklamak (bilgisayar)','Du musst dieses Wort anklicken.'],
+['ankommen','varmak / ulaşmak','Wann kommt der Zug an?'],
+['die Ankunft','varış','Hier steht die Ankunftszeit der Züge.'],
+['ankreuzen','işaretlemek (çarpı)','Sie müssen mehrere Felder ankreuzen.'],
+['anmachen','açmak (ışık vb.)','Mach bitte das Licht an!'],
+['sich anmelden','kayıt yaptırmak','Wo kann ich mich anmelden?'],
+['die Anmeldung','kayıt / başvuru','Eine Anmeldung ist nicht mehr möglich.'],
+['die Anrede','hitap / selamlama','Schreiben Sie bitte eine Anrede.'],
+['anrufen','aramak (telefon)','Kann man Sie anrufen?'],
+['der Anruf','telefon araması','Sie bekommt viele Anrufe.'],
+['der Anrufbeantworter','telesekreter','Bitte sprechen Sie auf den Anrufbeantworter.'],
+['die Ansage','anons / duyuru','Hören Sie die Ansagen.'],
+['der Anschluss','bağlantı (tren/tel.)','In Mannheim haben Sie Anschluss.'],
+['an sein','açık olmak (ışık vb.)','Heute Nacht war das Licht an.'],
+['antworten','cevap vermek','Er antwortet nicht.'],
+['die Antwort','cevap / yanıt','Er gibt leider keine Antwort.'],
+['die Anzeige','ilan / reklam','Ich habe Ihre Anzeige gelesen.'],
+['sich anziehen','giyinmek','Ich muss mich noch anziehen.'],
+['das Apartment','daire','Wir haben ein Apartment gemietet.'],
+['der Apfel','elma','Ein Pfund Äpfel, bitte.'],
+['der Appetit','iştah','Guten Appetit!'],
+['arbeiten','çalışmak','Wo arbeiten Sie?'],
+['die Arbeit','iş / çalışma','Mein Bruder sucht Arbeit.'],
+['arbeitslos','işsiz','Es gibt viele arbeitslose Menschen.'],
+['der Arbeitsplatz','çalışma yeri','An meinem Arbeitsplatz fehlt ein Drucker.'],
+['der Arm','kol (beden)','Mein Arm tut weh.'],
+['der Arzt','doktor / hekim','Morgen habe ich einen Termin beim Arzt.'],
+['auch','de / da / aynı zamanda','Ich bin auch Spanier.'],
+['auf','üzerinde / açık','Die Kinder spielen auf der Straße.'],
+['Auf Wiedersehen','hoşça kal (resmi)','Auf Wiedersehen, Frau Müller!'],
+['die Aufgabe','görev / ödev','Das ist eine schwere Aufgabe.'],
+['aufhören','durmak / bitmek','Der Kurs hört in einer Woche auf.'],
+['auf sein','açık olmak (kapı vb.)','Die Wohnung ist auf.'],
+['aufstehen','kalkmak (yataktan)','Ich stehe immer um sechs auf.'],
+['der Aufzug','asansör','In diesem Haus gibt es keinen Aufzug.'],
+['das Auge','göz','Er hat blaue Augen.'],
+['aus','çıkmış / -den','Er kommt aus Brasilien.'],
+['der Ausflug','gezi / günübirlik','Morgen machen wir einen Ausflug.'],
+['ausfüllen','doldurmak (form)','Füllen Sie bitte dieses Formular aus.'],
+['der Ausgang','çıkış','Wo ist der Ausgang?'],
+['die Auskunft','bilgi / enformasyon','Können Sie mir eine Auskunft geben?'],
+['das Ausland','yurt dışı','Fahren Sie ins Ausland?'],
+['der Ausländer','yabancı (kişi)','Sind Sie Ausländer?'],
+['ausländisch','yabancı (sıfat)','Ich habe nur ausländisches Geld.'],
+['ausmachen','kapatmak (ışık vb.)','Mach bitte das Licht aus!'],
+['die Aussage','ifade / cümle','Ist die Aussage richtig oder falsch?'],
+['aussehen','görünmek','Das sieht schön aus.'],
+['aus sein','kapalı / bitmiş olmak','Die Schule ist aus.'],
+['aussteigen','inmek (araçtan)','Wo muss ich aussteigen?'],
+['der Ausweis','kimlik belgesi','Hier ist mein Ausweis.'],
+['sich ausziehen','soyunmak','Zieh die Schuhe aus!'],
+['das Auto','araba / otomobil','Er kommt mit dem Auto.'],
+['die Autobahn','otoyol','Wo geht es zur Autobahn?'],
+['der Automat','otomat / makine','Die Fahrkarten gibt es am Automaten.'],
+['automatisch','otomatik olarak','Das geht automatisch.'],
+]},
+{id:'bc',name:'B – C harfi',tag:'Baby → Computer',words:[
+['das Baby','bebek','Mein Kind ist noch ein Baby.'],
+['die Bäckerei','fırın / ekmek dükkanı','Ich geh mal schnell zur Bäckerei.'],
+['das Bad','banyo','Wir haben kein großes Bad.'],
+['das Badezimmer','banyo odası','Das Badezimmer ist klein.'],
+['baden','banyo yapmak (küvette)','Ich bade nicht gern, ich dusche lieber.'],
+['die Bahn','tren / metro','Wir fahren lieber mit der Bahn.'],
+['der Bahnhof','tren garı / istasyon','Wie komme ich zum Bahnhof?'],
+['der Bahnsteig','peron','Auf welchem Bahnsteig fährt der Zug?'],
+['der Balkon','balkon','Die Wohnung hat einen Balkon.'],
+['die Banane','muz','Drei Bananen, bitte!'],
+['die Bank','banka; sıra (oturma)','Die Bank schließt um vier Uhr.'],
+['bar','nakit','Muss ich bar zahlen?'],
+['der Bauch','karın / göbek','Mein Bauch tut weh.'],
+['der Baum','ağaç','Fahr nicht an den Baum!'],
+['der Beamte','memur','Fragen Sie die Beamtin!'],
+['bedeuten','anlamına gelmek','Was bedeutet dieses Wort?'],
+['beginnen','başlamak','Das Spiel beginnt um 15.30 Uhr.'],
+['bei','yanında / -de','Ich wohne bei meinen Eltern.'],
+['beide','her ikisi de','Beide Eltern arbeiten.'],
+['das Bein','bacak','Mein rechtes Bein tut weh.'],
+['das Beispiel','örnek','Kannst du mir ein Beispiel sagen?'],
+['zum Beispiel','örneğin (z.B.)','Viele Verwandte, z.B. meine Brüder.'],
+['bekannt','tanınmış / bilinen','Picasso ist sehr bekannt.'],
+['der/die Bekannte','tanıdık','Ein Bekannter von mir heißt Klaus.'],
+['bekommen','almak / elde etmek','Haben Sie meinen Brief bekommen?'],
+['benutzen','kullanmak','Die Aufzüge bitte nicht benutzen!'],
+['der Beruf','meslek / iş','Was sind Sie von Beruf?'],
+['besetzt','meşgul / dolu (yer)','Der Platz ist besetzt.'],
+['besichtigen','gezmek / ziyaret etmek','Ich möchte den Dom besichtigen.'],
+['besser','daha iyi','Es geht mir schon besser.'],
+['bestellen','sipariş vermek','Wir möchten bestellen, bitte.'],
+['besuchen','ziyaret etmek','Darf ich dich besuchen?'],
+['das Bett','yatak','Wir brauchen ein neues Bett.'],
+['bezahlen','ödemek','Wo muss ich bezahlen?'],
+['das Bier','bira','Noch ein Bier, bitte.'],
+['das Bild','resim / fotoğraf','Hast du ein Bild von deinem Sohn?'],
+['billig','ucuz','Die Jacke kostet nur zehn Euro! Billig!'],
+['die Birne','armut','Ein Kilo Birnen, bitte!'],
+['bisschen','biraz','Ich spreche ein bisschen Deutsch.'],
+['bitte','lütfen; rica ederim','Eine Tasse Kaffee, bitte!'],
+['die Bitte','rica','Ich habe noch eine Bitte.'],
+['bitten','rica etmek','Darf ich Sie um etwas bitten?'],
+['bitter','acı (tat)','Der Kaffee schmeckt bitter.'],
+['bleiben','kalmak','Ich bleibe heute zu Hause.'],
+['der Bleistift','kurşun kalem','Hast du einen Bleistift?'],
+['der Blick','manzara / bakış','Von hier hat man einen Blick auf den Rhein.'],
+['die Blume','çiçek','Gefallen dir die Blumen?'],
+['der Bogen','form / kağıt / sayfa','Schreiben Sie auf den Antwortbogen.'],
+['böse','kızgın / sinirli','Sie ist böse auf mich.'],
+['brauchen','ihtiyacı olmak','Brauchst du die Zeitung noch?'],
+['breit','geniş / enli','Wie breit ist der Schrank?'],
+['der Brief','mektup','Haben Sie einen Brief für mich?'],
+['die Briefmarke','pul (posta)','Kaufst du bitte Briefmarken?'],
+['bringen','getirmek','Bringen Sie mir bitte Kaffee!'],
+['das Brot','ekmek','Haben Sie auch Weißbrot?'],
+['das Brötchen','sandviç ekmeği','Möchtest du Brötchen zum Frühstück?'],
+['der Bruder','erkek kardeş','Sein Bruder arbeitet auch hier.'],
+['das Buch','kitap','Gute Bücher sind oft teuer.'],
+['das Wörterbuch','sözlük','In diesem Wörterbuch finden Sie viele Wörter.'],
+['der Buchstabe','harf','Diesen Buchstaben gibt es in meiner Sprache nicht.'],
+['buchstabieren','harflerini söylemek','Bitte buchstabieren Sie Ihren Namen.'],
+['der Bus','otobüs','Wann kommt der nächste Bus?'],
+['die Butter','tereyağı','Ein Brötchen mit Butter, bitte.'],
+['das Café','kafe / kahvehane','Sollen wir uns im Café treffen?'],
+['die CD','CD','Bring bitte deine Lieblings-CD mit.'],
+['der Chef','şef / patron / amir','Wir haben eine neue Chefin.'],
+['circa / ca.','yaklaşık','Von hier sind es circa 50 Kilometer.'],
+['der Computer','bilgisayar','Wann bekommst du deinen Computer?'],
+]},
+{id:'d',name:'D harfi',tag:'da → duschen',words:[
+['da','orada / işte / gelince','Ist Herr Klein schon da?'],
+['die Dame','bayan / hanım','Sehr geehrte Damen und Herren!'],
+['daneben','yanında / yanı başında','Die Post? Daneben ist die Bank.'],
+['danken','teşekkür etmek','Ich danke Ihnen für die Einladung.'],
+['der Dank','teşekkür','Vielen Dank! Herzlichen Dank!'],
+['danke','teşekkürler','Soll ich helfen? – Nein, danke!'],
+['das Datum','tarih','Bitte schreiben Sie das Datum auf das Formular.'],
+['dauern','sürmek (zaman)','Wie lange dauert der Film?'],
+['denn','çünkü','Ich kann nicht kommen, denn ich bin krank.'],
+['dich','seni (belirtme)','Die Blumen sind für dich.'],
+['dies-','bu / şu','Ich nehme lieber diesen Kuchen.'],
+['dir','sana (yönelme)','Gefallen dir die Blumen?'],
+['die Disco','disko','Heute Abend gehen wir in die Disco.'],
+['der Doktor','doktor','Meine Tochter ist krank. Wir gehen zum Doktor.'],
+['das Doppelzimmer','iki kişilik oda','Wollen Sie ein Doppelzimmer?'],
+['das Dorf','köy','Meine Familie lebt in einem Dorf.'],
+['dort','orada','Dort ist unser Haus.'],
+['dorthin','oraya (yön)','Deine Tasche kannst du dorthin stellen.'],
+['draußen','dışarıda','Wollen wir draußen sitzen?'],
+['drucken','yazdırmak','Bitte drucke das Formular für mich.'],
+['der Drucker','yazıcı','Mein Drucker ist kaputt.'],
+['drücken','basmak / itmek','Drück hier, dann geht der Computer an.'],
+['durch','içinden / vasıtasıyla','Gehen Sie durch die Breite Straße.'],
+['die Durchsage','anons (hoparlör)','Ich habe die Durchsage nicht verstanden.'],
+['dürfen','izinli olmak','Sie dürfen hier nicht rauchen.'],
+['der Durst','susuzluk','Ich habe großen Durst.'],
+['sich duschen','duş almak','Ich bade nicht gern, ich dusche lieber.'],
+['die Dusche','duş','Unsere Wohnung hat nur eine Dusche.'],
+]},
+{id:'ef',name:'E – F harfi',tag:'Ecke → Fußball',words:[
+['die Ecke','köşe','An der nächsten Ecke links.'],
+['die Ehefrau','eş (kadın)','Das ist meine Ehefrau.'],
+['der Ehemann','eş (erkek)','Das ist mein Ehemann.'],
+['das Ei','yumurta','Möchtest du ein Ei zum Frühstück?'],
+['eilig','acele','Hast du es eilig?'],
+['einfach','basit; tek yön','Die Prüfung ist ganz einfach.'],
+['der Eingang','giriş','Der Eingang ist um die Ecke.'],
+['einkaufen','alışveriş yapmak','Ich muss noch einkaufen.'],
+['einladen','davet etmek','Darf ich Sie zu einem Kaffee einladen?'],
+['die Einladung','davet','Danke für die Einladung!'],
+['einmal','bir kez','Diese Prüfung mache ich nicht noch einmal.'],
+['einsteigen','binmek (araca)','Schnell, steig ein, der Zug fährt gleich!'],
+['der Eintritt','giriş ücreti','Der Eintritt kostet fünf Euro.'],
+['das Einzelzimmer','tek kişilik oda','Haben Sie noch ein Einzelzimmer?'],
+['die Eltern','anne-baba / ebeveynler','Meine Eltern leben in Spanien.'],
+['die E-Mail','e-posta','Ich habe Ihre E-Mail nicht bekommen.'],
+['der Empfänger','alıcı (mektup)','Du bist der Empfänger des Briefs.'],
+['empfehlen','tavsiye etmek','Welchen Wein können Sie mir empfehlen?'],
+['enden','bitmek / sona ermek','Die Straße endet hier.'],
+['das Ende','son / bitiş','Er bekommt Geld am Ende des Monats.'],
+['sich entschuldigen','özür dilemek','Entschuldigen Sie bitte!'],
+['die Entschuldigung','özür','Entschuldigung! – Bitte.'],
+['das Ergebnis','sonuç','Das Ergebnis des Tests bekomme ich bald.'],
+['erklären','açıklamak','Kannst du mir das erklären?'],
+['erlauben','izin vermek','Rauchen ist hier nicht erlaubt.'],
+['der Erwachsene','yetişkin','Dieser Film ist nur für Erwachsene.'],
+['erzählen','anlatmak','Erzähl uns bitte mehr davon!'],
+['essen','yemek yemek','Was gibt es zu essen?'],
+['das Essen','yemek (isim)','Das Essen ist heute sehr gut.'],
+['fahren','gitmek (araçla)','Ich fahre mit dem Auto zur Arbeit.'],
+['der Fahrer','şoför / sürücü','Bitte nicht mit dem Fahrer sprechen!'],
+['die Fahrkarte','bilet (tren/otobüs)','Hast du schon eine Fahrkarte?'],
+['das Fahrrad','bisiklet','Fährst du mit dem Fahrrad?'],
+['falsch','yanlış / hatalı','Das ist falsch.'],
+['die Familie','aile','Meine Familie lebt in Spanien.'],
+['der Familienname','soyadı','Schmidt ist mein Familienname.'],
+['der Familienstand','medeni hal','Bei Familienstand kreuze ich ledig an.'],
+['die Farbe','renk; boya','Die Farbe gefällt mir gut.'],
+['das Fax','faks','Schicken Sie uns einfach ein Fax!'],
+['der Feiertag','resmi tatil','Am Montag ist Feiertag.'],
+['der Feierabend','iş çıkışı saati','Um fünf Uhr ist Feierabend.'],
+['feiern','kutlamak','Wir feiern heute meinen Geburtstag.'],
+['fehlen','eksik olmak / yok olmak','Herr Müller fehlt seit drei Tagen.'],
+['der Fehler','hata / yanlış','Diesen Fehler mache ich immer.'],
+['fernsehen','televizyon izlemek','Wollen wir heute Abend fernsehen?'],
+['fertig','hazır / bitmiş','Bist du fertig?'],
+['das Feuer','ateş; çakmak','Haben Sie Feuer?'],
+['das Fieber','ateş (hastalık)','Mein Mann hat noch immer Fieber.'],
+['der Film','film','Ich möchte diesen Film sehen.'],
+['finden','bulmak','Wir müssen den Schlüssel finden.'],
+['die Firma','firma / şirket','Er arbeitet bei einer anderen Firma.'],
+['der Fisch','balık','Ich esse gern Fisch.'],
+['die Flasche','şişe','Eine Flasche Bier, bitte.'],
+['das Fleisch','et','Fleisch mag ich nicht.'],
+['fliegen','uçmak','Ich fliege nicht gern, ich fahre lieber Zug.'],
+['der Flughafen','havalimanı','Kannst du mich zum Flughafen bringen?'],
+['das Flugzeug','uçak','Das Flugzeug aus Berlin kommt später an.'],
+['das Formular','form / belge','Sie müssen dieses Formular ausfüllen.'],
+['das Foto','fotoğraf','Darf ich ein Foto machen?'],
+['fragen','sormak','Er möchte Sie etwas fragen.'],
+['die Frage','soru','Ich habe eine Frage.'],
+['die Frau','kadın; hanım; eş','Guten Tag, Frau Schmitt!'],
+['frei','boş / serbest','Ist der Platz noch frei?'],
+['die Freizeit','boş zaman','In meiner Freizeit spiele ich Fußball.'],
+['fremd','yabancı (yer)','Das weiß ich nicht, ich bin fremd hier.'],
+['sich freuen','sevinmek','Ich freue mich auf den Urlaub.'],
+['der Freund','erkek arkadaş; dost','Das ist ein Freund von mir.'],
+['die Freundin','kız arkadaş (dost)','Das ist meine Freundin.'],
+['früher','eskiden / daha önce','Früher waren wir oft zusammen im Kino.'],
+['frühstücken','kahvaltı etmek','Am Sonntag frühstücke ich im Bett.'],
+['das Frühstück','kahvaltı','Möchtest du ein Ei zum Frühstück?'],
+['die Führung','tur / rehberlik','Die Führung beginnt in drei Minuten.'],
+['für','için','Das ist für Sie.'],
+['der Fuß','ayak','Der linke Fuß tut mir weh.'],
+['der Fußball','futbol; futbol topu','Spielst du gern Fußball?'],
+]},
+{id:'gh',name:'G – H harfi',tag:'Garten → Hunger',words:[
+['der Garten','bahçe','Wir haben leider keinen Garten.'],
+['der Gast','misafir / konuk','Am Wochenende haben wir mehrere Gäste.'],
+['geben','vermek','Kannst du mir deinen Stift geben?'],
+['Es gibt','var (bir şey)','Es gibt keine Karten mehr.'],
+['geboren','doğmuş','Ich bin in Zagreb geboren.'],
+['das Geburtsjahr','doğum yılı','Das Geburtsjahr Ihres Sohnes?'],
+['der Geburtsort','doğum yeri','Bitte schreiben Sie Ihren Geburtsort.'],
+['der Geburtstag','doğum günü','Herzlichen Glückwunsch zum Geburtstag!'],
+['gefallen','hoşuna gitmek','Das gefällt mir sehr.'],
+['gegen','karşı; yaklaşık (saat)','Ich bin gegen diese Lösung.'],
+['gehen','gitmek; yürümek; işe yaramak','Wie geht es Ihnen?'],
+['Das geht nicht!','Bu olmaz! Mümkün değil!','Das geht leider nicht.'],
+['gehören','ait olmak','Wem gehört das?'],
+['das Geld','para','Hast du noch Geld?'],
+['das Gemüse','sebze','Gemüse brauchen wir auch noch.'],
+['das Gepäck','bagaj / eşya','Wollen Sie Ihr Gepäck mitnehmen?'],
+['gerade','az önce; tam şu an','Da kommt er ja gerade.'],
+['geradeaus','düz / doğruca','Gehen Sie immer geradeaus!'],
+['gern(e)','severek / memnuniyetle','Ich gehe gern einkaufen.'],
+['das Geschäft','dükkan / mağaza','Die Geschäfte schließen um 18 Uhr.'],
+['das Geschenk','hediye','Danke für das schöne Geschenk.'],
+['die Geschwister','kardeşler (genel)','Ich habe keine Geschwister.'],
+['das Gespräch','konuşma / görüşme','Das Gespräch ist um 14 Uhr.'],
+['gestorben','ölmüş / vefat etmiş','Meine Frau ist gestorben.'],
+['das Getränk','içecek','Mein Lieblingsgetränk ist Saft.'],
+['das Gewicht','ağırlık; kilo','Sein Gewicht ist normal.'],
+['gewinnen','kazanmak','Wer gewinnt das Spiel?'],
+['das Glas','bardak; cam','Bitte noch ein Glas Wein!'],
+['glauben','inanmak; sanmak','Ich glaube, er kommt gleich.'],
+['das Gleis','peron / ray','Der ICE hält an Gleis 12.'],
+['das Glück','şans; mutluluk','Viel Glück!'],
+['glücklich','mutlu; şanslı','Meine Kinder sind glücklich.'],
+['der Glückwunsch','tebrik','Herzlichen Glückwunsch zum Geburtstag!'],
+['gratulieren','tebrik etmek','Ich gratuliere dir!'],
+['grillen','ızgara yapmak','Heute grillen wir im Garten.'],
+['groß','büyük; uzun boylu','Frankfurt ist eine große Stadt.'],
+['die Größe','beden; boyut','Haben Sie das in Größe 40?'],
+['die Großeltern','büyükanne ve büyükbaba','Meine Großeltern leben in Japan.'],
+['die Großmutter','büyükanne','Meine Großmutter heißt Eva.'],
+['der Großvater','büyükbaba','Mein Großvater ist schon achtzig.'],
+['die Gruppe','grup / takım','Die erste Gruppe beginnt um 16 Uhr.'],
+['der Gruß','selam / selamlama','Viele Grüße an Ihre Frau!'],
+['Mit freundlichen Grüßen','saygılarımla (mektup)','Mit freundlichen Grüßen, Müller.'],
+['gültig','geçerli','Der Pass ist nicht mehr gültig.'],
+['günstig','uygun (fiyat)','Dort gibt es günstige Angebote.'],
+['gut','iyi; tamam','Guten Morgen! Das finde ich gut.'],
+['das Haar','saç','Sie hat lange Haare.'],
+['haben','sahip olmak','Ich habe ein neues Auto.'],
+['das Hähnchen','piliç / tavuk (yemek)','Ein Hähnchen mit Pommes, bitte!'],
+['die Halbpension','yarım pansiyon','Möchten Sie Vollpension oder Halbpension?'],
+['die Halle','salon / hol','Wir treffen uns in Halle B.'],
+['hallo','merhaba','Hallo Inge! Wie geht es dir?'],
+['halten','durmak (araç); tutmak','Dieser Zug hält nicht in Rüdesheim.'],
+['die Haltestelle','durak','An der nächsten Haltestelle aussteigen.'],
+['die Hand','el','Er gibt mir die Hand.'],
+['das Handy','cep telefonu','Bitte die Handys ausmachen!'],
+['das Haus','ev; bina','In welchem Haus wohnst du?'],
+['nach Hause','eve (doğru)','Ich gehe jetzt nach Hause.'],
+['zu Hause','evde','Paul ist nicht zu Hause.'],
+['die Hausaufgabe','ödev','Kannst du mir bei den Hausaufgaben helfen?'],
+['die Hausfrau','ev hanımı','Die Hausfrau wäscht, kocht und kauft ein.'],
+['die Heimat','memleket / yurt','Die Schweiz ist meine Heimat.'],
+['heiraten','evlenmek','Meine Schwester heiratet einen Japaner.'],
+['heißen','adı olmak','Ich heiße Charlotte Meier.'],
+['helfen','yardım etmek','Können Sie mir helfen, bitte?'],
+['hell','aydınlık; açık renk','Im Sommer ist es bis 21 Uhr hell.'],
+['der Herd','ocak (mutfak)','In der neuen Küche fehlt noch der Herd.'],
+['der Herr','bay; efendi','Guten Tag, Herr Sommer!'],
+['herzlich','candan; içtenlikle','Herzlichen Glückwunsch!'],
+['die Hilfe','yardım','Hilfe! Bitte helfen Sie mir!'],
+['hinten','arkada / geride','Die Tür zum Aussteigen ist hinten.'],
+['das Hobby','hobi / ilgi alanı','Meine Hobbys sind Wandern und Schwimmen.'],
+['hoch','yüksek','Der Berg ist sehr hoch.'],
+['die Hochzeit','düğün','Zu dieser Hochzeit kommen fünfzig Gäste.'],
+['holen','almaya gitmek; getirmek','Ich hole zwei Flaschen Wasser.'],
+['hören','duymak; dinlemek','Hör mal! Was ist das?'],
+['das Hotel','otel','Im Urlaub sind wir in einem Hotel am Meer.'],
+['der Hund','köpek','Der Hund ist noch jung.'],
+['der Hunger','açlık','Ich habe Hunger! Wann ist das Essen fertig?'],
+]},
+{id:'ik',name:'I – K harfi',tag:'ich → kurz',words:[
+['ich','ben','Ich heiße Veronika.'],
+['ihm','ona (yönelme, erkek)','Gib ihm bitte das Buch.'],
+['ihn','onu (belirtme, erkek)','Ruf ihn bitte an.'],
+['ihr','ona (yönelme, kadın); sizin','Gib ihr bitte das Buch.'],
+['in','içinde; -e (yön)','Ich wohne in Wiesbaden.'],
+['die Information','bilgi; enformasyon','Gehen Sie bitte zur Information.'],
+['international','uluslararası','Unser Kurs ist international.'],
+['das Internet','internet','Das findest du im Internet.'],
+['ja','evet','Sind Sie Herr Watanabe? – Ja.'],
+['die Jacke','ceket / mont','Zieh dir eine Jacke an, es ist kalt.'],
+['jed-','her; her bir','Blumen kannst du in jedem Bahnhof kaufen.'],
+['der Job','iş; çalışma','Jenny hat einen neuen Job bei der Post.'],
+['der Jugendliche','genç (kişi)','Viele Jugendliche kaufen gern ein.'],
+['jung','genç','Claudia ist 21 – noch so jung!'],
+['der Junge','erkek çocuk','Ich habe einen Jungen und ein Mädchen.'],
+['der Kaffee','kahve','Zum Frühstück trinke ich Kaffee.'],
+['kaputt','bozuk; kırık','Das Glas ist kaputt.'],
+['die Karte','kart; harita; menü','Bringen Sie mir die Karte, bitte.'],
+['die Kredit-Karte','kredi kartı','Kann ich mit Karte bezahlen?'],
+['die Kartoffel','patates','Für Pommes braucht man Kartoffeln.'],
+['die Kasse','kasa (ödeme)','Zahlen Sie bitte an der Kasse.'],
+['kaufen','satın almak','Tim kauft sich ein neues Auto.'],
+['kein','hiç; yok (olumsuz)','Es gibt keine Eintrittskarten mehr.'],
+['kennen','tanımak; bilmek','Kennen Sie diese Frau?'],
+['kennenlernen','tanışmak','Wir möchten Sie kennenlernen.'],
+['das Kind','çocuk','Wie viele Kinder haben Sie?'],
+['der Kindergarten','anaokulu','Die kleine Laura geht in den Kindergarten.'],
+['das Kino','sinema','Wir sehen heute Abend einen Film im Kino.'],
+['der Kiosk','büfe; kiosk','Am Kiosk bekommen Sie Zeitungen.'],
+['klar','açık; tabii ki','Kommst du mit? – Klar!'],
+['die Klasse','sınıf; mevki','In unserer Klasse sind 25 Schüler.'],
+['die Kleidung','giysi; kıyafet','Wo finde ich Kleidung?'],
+['klein','küçük; kısa boylu','Eltville ist eine kleine Stadt.'],
+['kochen','yemek pişirmek','Herr Georgi kann gut kochen.'],
+['der Koffer','bavul','Ist das Ihr Koffer?'],
+['der Kollege','meslektaş; iş arkadaşı','Wie heißt die neue Kollegin?'],
+['kommen','gelmek','Woher kommen Sie?'],
+['können','yapabilmek; bilmek','Ich kann Deutsch und Russisch.'],
+['das Konto','hesap (banka)','Das Geld überweisen wir auf Ihr Konto.'],
+['der Kopf','baş; kafa','Mein Kopf tut weh!'],
+['kosten','mal olmak (fiyat)','Wie viel kostet das?'],
+['krank','hasta','Ich bin krank und liege im Bett.'],
+['kriegen','almak (konuşma dili)','Ich kriege 15 Euro pro Stunde.'],
+['die Küche','mutfak','Der neue Herd kommt in die Küche.'],
+['der Kuchen','pasta; kek','Ich nehme ein Stück Kuchen.'],
+['der Kugelschreiber','tükenmez kalem','Hast du einen Kugelschreiber?'],
+['der Kühlschrank','buzdolabı','Die Milch steht im Kühlschrank.'],
+['kulturell','kültürel','Ich bin kulturell interessiert.'],
+['sich kümmern','ilgilenmek; bakmak','Jede Mutter kümmert sich um ihre Kinder.'],
+['der Kunde','müşteri','Ich habe gerade eine Kundin.'],
+['der Kurs','kurs; ders','Der Deutschkurs geht bis zum Sommer.'],
+['kurz','kısa; kısa süre','Ricardo hat kurzes Haar.'],
+]},
+{id:'lm',name:'L – M harfi',tag:'lachen → müssen',words:[
+['lachen','gülmek','Die Kinder lachen viel.'],
+['der Laden','dükkan; mağaza','Im Buchladen können Sie Bücher kaufen.'],
+['das Land','ülke; kırsal alan','Italien ist ein schönes Land.'],
+['lang','uzun (boyut)','Die Jeans ist zu lang.'],
+['lange','uzun süre','Wie lange fährt der Zug?'],
+['langsam','yavaş','Könnten Sie bitte langsamer sprechen?'],
+['laufen','koşmak; yürümek','Ich möchte lieber laufen.'],
+['laut','gürültülü; yüksek sesle','Nicht so laut! Das Baby schläft.'],
+['leben','yaşamak','Sie lebt bei ihrer Schwester.'],
+['das Leben','yaşam; hayat','Das Leben hier ist teuer.'],
+['die Lebensmittel','gıda; yiyecekler','Lebensmittel gibt es im Supermarkt.'],
+['ledig','bekar','Sind Sie verheiratet? – Nein, ledig.'],
+['legen','koymak (yatay)','Legen Sie das Buch auf den Tisch.'],
+['der Lehrer','öğretmen','Unsere Deutschlehrerin heißt Frau Müller.'],
+['leicht','kolay; hafif','Deutsch ist nicht leicht.'],
+['leider','maalesef; ne yazık ki','Leider kann ich nicht kommen.'],
+['leise','sessizce; yavaş sesle','Seid leise, die anderen schlafen.'],
+['lernen','öğrenmek','Wie lange lernen Sie schon Deutsch?'],
+['lesen','okumak','Ich lese ein Buch von García Márquez.'],
+['letzt-','son; geçen','Morgen ist der letzte Kurstag.'],
+['die Leute','insanlar; halk','In der Disko sind viele Leute.'],
+['das Licht','ışık','Wo macht man das Licht an?'],
+['lieb-','sevgili (mektupta)','Liebe Susanne, lieber Hans,'],
+['lieben','sevmek','Ich liebe dich!'],
+['lieber','daha çok; tercihan','Sie fährt lieber mit der Bahn.'],
+['Lieblings-','en sevilen; favori','Mein Lieblingsfilm ist toll.'],
+['das Lied','şarkı','Welches ist dein Lieblingslied?'],
+['liegen','yatmak; bulunmak','Frankfurt liegt am Main.'],
+['links','sol; sola','Gehen Sie die nächste Straße links.'],
+['der Lkw','TIR; kamyon','Dieser Lkw ist sehr groß.'],
+['das Lokal','meyhane; lokanta','In unserer Straße gibt es ein neues Lokal.'],
+['die Lösung','çözüm; cevap','Die Lösung ist ganz einfach.'],
+['lustig','eğlenceli; komik','Frau Mertens ist lustig, sie lacht immer.'],
+['machen','yapmak; hazırlamak','Was machst du heute Abend?'],
+['das Mädchen','kız çocuk','Familie Kurz bekommt ein Baby – Junge oder Mädchen?'],
+['man','kişi; biri (genel özne)','Hier darf man nicht rauchen.'],
+['der Mann','erkek; koca','Mein Mann arbeitet bei der Polizei.'],
+['männlich','erkek; eril','Kreuzen Sie bitte männlich an.'],
+['die Maschine','makine; cihaz','Die Waschmaschine ist günstig.'],
+['das Meer','deniz; okyanus','Wir machen Urlaub am Meer.'],
+['mehr','daha fazla','Dieses Auto kostet mehr.'],
+['mein-','benim','Mein Vater ist Arzt.'],
+['meist-','çoğu; en çok','Die meisten Norddeutschen sind groß.'],
+['der Mensch','insan','Die Menschen hier sind freundlich.'],
+['mieten','kiralamak','Ich möchte ein Auto mieten.'],
+['die Miete','kira bedeli','Die Miete für diese Wohnung ist 600 Euro.'],
+['die Milch','süt','Die Milch steht im Kühlschrank.'],
+['mit','ile; birlikte','Trinken Sie Kaffee mit Milch?'],
+['mitbringen','yanında getirmek','Soll ich dir etwas mitbringen?'],
+['mitkommen','birlikte gelmek','Kommst du mit ins Kino?'],
+['mitmachen','katılmak; dahil olmak','Warum macht ihr nicht mit?'],
+['mitnehmen','yanında götürmek','Nehmen wir meine Schwester mit?'],
+['die Mitte','orta; merkez','Der Lehrer steht in der Mitte.'],
+['mitten in','tam ortasında','Wir wohnen mitten in der Stadt.'],
+['die Möbel','mobilya','Sind die Möbel neu?'],
+['möchten','istemek (nazik)','Was möchten Sie trinken?'],
+['mögen','sevmek; hoşlanmak','Magst du Kaffee oder Tee?'],
+['möglich','mümkün; olası','Ist das morgen möglich?'],
+['der Moment','an; dakika','Einen Moment bitte!'],
+['müde','yorgun','Ich bin müde, ich gehe schlafen.'],
+['der Mund','ağız','Öffnen Sie den Mund.'],
+['müssen','zorunda olmak','Ich muss jeden Tag arbeiten.'],
+['die Mutter','anne','Sie ist die Mutter von Michaela.'],
+]},
+{id:'no',name:'N – O harfi',tag:'nach → Ort',words:[
+['nach','-e doğru; sonra','Ich fliege nach München.'],
+['nach Hause','eve (doğru)','Ich gehe nach Hause.'],
+['nächst-','bir sonraki; gelecek','Sehen wir uns nächste Woche?'],
+['der Name','isim; ad','Mein Name ist Thomas Schmidt.'],
+['der Vorname','isim (ad)','Mein Vorname ist Thomas.'],
+['nehmen','almak; seçmek','Ich nehme den Bus.'],
+['nein','hayır','Fährst du auch? – Nein.'],
+['neu','yeni','Wir haben eine neue Wohnung.'],
+['nicht','değil; olumsuzlama','Das stimmt nicht.'],
+['nichts','hiçbir şey','Das macht nichts.'],
+['noch einmal','bir kez daha','Bitte sagen Sie das noch einmal.'],
+['normal','normal; olağan','Sein Gewicht ist normal.'],
+['die Nummer','numara; sayı','Können Sie mir Ihre Nummer geben?'],
+['nur','sadece; yalnızca','Ich möchte nur ein Glas Wasser.'],
+['oben','yukarıda; üstte','Ich wohne oben.'],
+['das Obst','meyve','Im Sommer ist das Obst billig.'],
+['oder','ya da; veya','Heute oder morgen?'],
+['öffnen','açmak','Ich öffne die Tür.'],
+['geöffnet','açık (işletme)','Der Laden ist samstags bis 16 Uhr geöffnet.'],
+['oft','sık sık','Petra treffe ich oft.'],
+['ohne','-siz; olmadan','Ohne Geld kann er nichts kaufen.'],
+['das Öl','yağ (motor/salata)','Den Salat machen wir ohne Öl.'],
+['die Oma','büyükanne; babaanne','Meine Oma ist schon tot.'],
+['der Opa','büyükbaba; dede','Mein Opa heißt Hans.'],
+['die Ordnung','düzen; tertip','Das ist in Ordnung.'],
+['der Ort','yer; kasaba','Der Ort liegt am Meer.'],
+]},
+{id:'pr',name:'P – R harfi',tag:'Papier → ruhig',words:[
+['das Papier','kağıt','Hier sind Papier und Bleistift.'],
+['die Papiere','belgeler; evraklar','Haben Sie Ihre Papiere dabei?'],
+['der Partner','partner; eş; ortak','Sie ist meine Partnerin.'],
+['die Party','parti; eğlence','Heute Abend machen wir eine Party.'],
+['der Pass','pasaport','Im Hotel brauchst du deinen Pass.'],
+['die Pause','mola; ara','Jetzt haben wir Mittagspause.'],
+['der Plan','plan; harita','Ich kaufe mir einen Stadtplan.'],
+['der Platz','yer; alan; meydan','Tut mir leid, der Platz ist besetzt.'],
+['die Polizei','polis','Holen Sie die Polizei!'],
+['die Pommes frites','patates kızartması','Die Kinder essen Hähnchen mit Pommes.'],
+['die Post','posta; postane','Wo ist die Post, bitte?'],
+['die Postleitzahl','posta kodu','Wie ist Ihre Postleitzahl?'],
+['das Praktikum','staj','Ich mache ein Praktikum bei Siemens.'],
+['die Praxis','muayenehane; klinik','Die Praxis ist ab acht Uhr geöffnet.'],
+['der Preis','fiyat; ücret','Die Preise sind hoch.'],
+['das Problem','sorun; problem','Mein Problem ist die Sprache.'],
+['der Prospekt','broşür; katalog','Schicken Sie mir bitte einen Prospekt.'],
+['die Prüfung','sınav','Die Prüfung ist am Montag.'],
+['pünktlich','dakik; zamanında','Der Bus fährt pünktlich.'],
+['Rad fahren','bisiklete binmek','Das Kind kann schon Rad fahren.'],
+['rauchen','sigara içmek','Ich rauche nicht.'],
+['der Raum','oda; mekan; alan','Der Unterricht ist in Raum 332.'],
+['die Rechnung','fatura; hesap','Die Rechnung, bitte!'],
+['rechts','sağ; sağda','Die Schillerstraße ist hier rechts.'],
+['regnen','yağmur yağmak','Heute regnet es.'],
+['der Regen','yağmur','Bei diesem Regen gehe ich nicht raus.'],
+['der Reis','pirinç','Ich esse gern Reis.'],
+['reisen','seyahat etmek','Ich reise gern.'],
+['die Reise','seyahat; gezi','Wir machen eine Reise nach Österreich.'],
+['das Reisebüro','seyahat acentesi','Mein Mann arbeitet im Reisebüro.'],
+['der Reiseführer','rehber (kişi/kitap)','Ich kaufe mir einen Reiseführer von Berlin.'],
+['reparieren','tamir etmek','Er hat das Fahrrad repariert.'],
+['die Reparatur','tamir; onarım','Die Reparatur ist sehr teuer.'],
+['das Restaurant','restoran','Wir essen heute in einem Restaurant.'],
+['die Rezeption','resepsiyon','Fragen Sie bitte an der Rezeption.'],
+['richtig','doğru; gerçek','Habe ich das richtig verstanden?'],
+['riechen','kokmak; koku almak','Dieser Wein riecht gut.'],
+['ruhig','sakin; sessiz','Ich möchte ein ruhiges Zimmer.'],
+]},
+{id:'s',name:'S harfi',tag:'Saft → suchen',words:[
+['der Saft','meyve suyu','Möchtest du einen Apfelsaft?'],
+['sagen','söylemek; demek','Sag mal, wie geht es dir?'],
+['der Salat','salata; marul','Wie schmeckt dir der Salat?'],
+['das Salz','tuz','Kann ich bitte Salz haben?'],
+['der Satz','cümle','Dieser Satz ist sehr einfach.'],
+['die S-Bahn','banliyö treni','Ich nehme lieber die S-Bahn.'],
+['der Schalter','gişe; şalter','Gehen Sie bitte zum Schalter drei!'],
+['scheinen','parlamak (güneş); görünmek','Die Sonne scheint.'],
+['schicken','göndermek','Bitte schicken Sie mir eine E-Mail.'],
+['das Schild','tabela; işaret; levha','Haben Sie nicht das Schild gesehen?'],
+['der Schinken','jambon','Ich möchte ein Schinkenbrot.'],
+['schlafen','uyumak','Ich schlafe meistens acht Stunden.'],
+['schlecht','kötü; bozuk','Mir ist schlecht! Schlechtes Wetter.'],
+['schließen','kapatmak','Bitte schließen Sie die Tür.'],
+['geschlossen','kapalı (işletme)','Die Bank ist am Samstag geschlossen.'],
+['der Schluss','son; bitiş','Zum Schluss gibt er uns die Hand.'],
+['der Schlüssel','anahtar','Ich gebe Ihnen den Zimmerschlüssel.'],
+['schmecken','tadı olmak; lezzetli olmak','Schmeckt das gut?'],
+['schnell','hızlı; çabuk','Er fährt zu schnell.'],
+['schön','güzel; hoş','Das ist sehr schön.'],
+['der Schrank','dolap; gardırop','Die Gläser stehen im Schrank.'],
+['schreiben','yazmak','Er schreibt jeden Tag E-Mails.'],
+['der Schuh','ayakkabı','Zieh die Schuhe aus!'],
+['die Schule','okul','Meine Tochter geht in die Schule.'],
+['der Schüler','öğrenci','In meinem Kurs sind acht Schülerinnen.'],
+['schwer','ağır; zor','Ist Ihr Gepäck sehr schwer?'],
+['die Schwester','kız kardeş','Meine Schwester kommt am Dienstag.'],
+['schwimmen','yüzmek','Ich schwimme jeden Tag einen Kilometer.'],
+['das Schwimmbad','yüzme havuzu','Kommst du mit ins Schwimmbad?'],
+['der See','göl','Wir fahren zum Starnberger See.'],
+['sehen','görmek; bakmak','Ich kann dich nicht sehen.'],
+['die Sehenswürdigkeit','turistik yer','Welche Sehenswürdigkeiten gibt es?'],
+['sehr','çok; oldukça','Danke sehr!'],
+['sein','olmak','Ich bin dreiundzwanzig Jahre alt.'],
+['an sein','açık olmak (ışık)','Das Licht ist noch an.'],
+['auf sein','açık olmak (kapı/pencere)','Das Fenster ist noch auf.'],
+['zu sein','kapalı olmak','Die Tür ist zu.'],
+['weg sein','gitmek; yok olmak','Herr Meier ist schon weg.'],
+['selbstständig','bağımsız; serbest meslek','Er ist selbstständig.'],
+['sich','kendini; kendine','Sie müssen sich erst anmelden.'],
+['sie','o (kadın); onlar','Wie heißt sie?'],
+['Sie','siz (saygı hitabı)','Wie heißen Sie, bitte?'],
+['sitzen','oturmak','Wo sitzen Sie?'],
+['so','böyle; öyle; bu kadar','Sie müssen das so machen!'],
+['das Sofa','kanepe; divan','Das Sofa ist neu.'],
+['der Sohn','oğul; erkek evlat','Das ist Hans, mein Sohn.'],
+['sollen','gerekmek; yapması lazım','Soll ich kommen?'],
+['die Sonne','güneş','Die Sonne scheint.'],
+['spät','geç','Es ist schon spät, ich muss gehen.'],
+['die Speisekarte','menü; yemek listesi','Bringen Sie mir die Speisekarte, bitte.'],
+['spielen','oynamak; çalmak (enstrüman)','Die Kinder spielen draußen.'],
+['der Sport','spor','Ich mache viel Sport.'],
+['die Sprache','dil; lisan','Welche Sprachen sprichst du?'],
+['sprechen','konuşmak','Kann ich bitte Herrn Klein sprechen?'],
+['die Stadt','şehir; kent','Heidelberg ist eine alte Stadt.'],
+['stehen','durmak; ayakta durmak','Der Bus steht an der Haltestelle.'],
+['die Stelle','yer; pozisyon','Ich habe eine neue Stelle.'],
+['stellen','koymak (dikey)','Stell die Tasche in die Ecke!'],
+['der Stock','kat (bina)','Unsere Wohnung liegt im ersten Stock.'],
+['die Straße','sokak; cadde; yol','In welcher Straße wohnen Sie?'],
+['die Straßenbahn','tramvay','Wo fährt die Straßenbahn ab?'],
+['studieren','üniversitede okumak','Ich studiere in Mainz.'],
+['das Studium','üniversite eğitimi','Das Studium beginnt im Oktober.'],
+['der Student','üniversite öğrencisi','Ich bin Student.'],
+['die Stunde','saat (süre); ders','Ich bin in einer Stunde zurück.'],
+['suchen','aramak (bulmaya çalışmak)','Suchst du etwas?'],
+]},
+{id:'tu',name:'T – U harfi',tag:'tanzen → Urlaub',words:[
+['tanzen','dans etmek','Tanzen Sie gern?'],
+['die Tasche','çanta; cep','Die Schlüssel habe ich in der Tasche.'],
+['das Taxi','taksi','Er fährt mit dem Taxi.'],
+['der Tee','çay','Ich trinke morgens immer Tee.'],
+['der Teil','kısım; bölüm; parça','Lies bitte auch den zweiten Teil.'],
+['telefonieren','telefonla konuşmak','Darf ich mal telefonieren?'],
+['das Telefon','telefon','Haben Sie Telefon?'],
+['der Termin','randevu','Am besten machen wir sofort einen Termin.'],
+['der Test','test; sınav','Der Test war einfach.'],
+['teuer','pahalı','Das ist mir zu teuer.'],
+['der Text','metin; yazı','Lesen Sie bitte diesen Text.'],
+['das Thema','konu; tema','Wir sprechen über das Thema Essen.'],
+['das Ticket','bilet (uçak/etkinlik)','Wie viel kostet das Ticket?'],
+['der Tisch','masa','Die Fotos liegen auf dem Tisch.'],
+['die Tochter','kız evlat','Das ist meine Tochter Katharina.'],
+['die Toilette','tuvalet; WC','Wo ist die Toilette, bitte?'],
+['die Tomate','domates','Die Tomate ist noch grün.'],
+['tot','ölü; hayatta olmayan','Sein Vater ist schon lange tot.'],
+['sich treffen','buluşmak','Wir treffen uns immer freitags.'],
+['die Treppe','merdiven','Die Treppe hoch und dann links.'],
+['trinken','içmek','Möchtest du etwas trinken?'],
+['tschüss','hoşça kal (informal)','Junge Leute sagen meistens tschüss.'],
+['tun','yapmak; etmek','Ich habe noch etwas zu tun.'],
+['über','üzerinde; hakkında','Gehen Sie über die Straße.'],
+['übernachten','gecelemek','Du kannst bei mir übernachten.'],
+['die Übernachtung','geceleme; konaklama','Eine Übernachtung kostet 80 Euro.'],
+['überweisen','havale etmek','Sie können das Geld überweisen.'],
+['die Uhr','saat (alet); saat (zaman)','Es ist vier Uhr.'],
+['um','saat...da; etrafında','Er kommt um sieben Uhr.'],
+['umziehen','taşınmak (ev)','Nächsten Monat ziehen wir um.'],
+['und','ve','Peter und Helmut sind meine Söhne.'],
+['unten','aşağıda; altta','Er wohnt ganz unten im Haus.'],
+['unter','altında; arasında','Unter uns wohnt eine Familie.'],
+['der Unterricht','ders; eğitim','Wir haben Unterricht von 8 bis 12 Uhr.'],
+['unterschreiben','imzalamak','Wo muss ich unterschreiben?'],
+['die Unterschrift','imza','Hier fehlt noch Ihre Unterschrift.'],
+['der Urlaub','tatil; izin','Ich nehme im September Urlaub.'],
+]},
+{id:'vw',name:'V – W harfi',tag:'Vater → wunderbar',words:[
+['der Vater','baba','Mein Vater ist Arbeiter.'],
+['verboten','yasak; yasaklanmış','Hier ist Rauchen verboten.'],
+['verdienen','kazanmak; maaş almak','Ich verdiene 1.500 Euro im Monat.'],
+['der Verein','dernek; kulüp','Es gibt einen neuen Sportverein.'],
+['verheiratet','evli','Ich bin verheiratet und habe drei Kinder.'],
+['verkaufen','satmak','Er verkauft sein altes Auto.'],
+['der Verkäufer','satıcı; mağaza görevlisi','Meine Mutter ist Verkäuferin.'],
+['vermieten','kiraya vermek','Die Wohnung ist schon vermietet.'],
+['der Vermieter','ev sahibi (kiraya veren)','Unser Vermieter heißt Huber.'],
+['verstehen','anlamak; kavramak','Können Sie mich verstehen?'],
+['der Verwandte','akraba','Peter besucht seine Verwandten.'],
+['viel','çok; fazla','Hier regnet es viel.'],
+['vielleicht','belki; olasılıkla','Ich komme vielleicht mit dem Bus.'],
+['von','-den; -dan; ait','Das Auto von Felix ist kaputt.'],
+['vor','önünde; -dan önce','Das Auto steht vor der Tür.'],
+['die Vorsicht','dikkat; ihtiyat','Vorsicht! Da kommt ein Auto.'],
+['sich vorstellen','kendini tanıtmak','Können Sie sich bitte vorstellen?'],
+['die Vorwahl','alan kodu; ülke kodu','Wie ist die Vorwahl von München?'],
+['wandern','doğa yürüyüşü yapmak','Wir wandern um den Chiemsee.'],
+['wann','ne zaman','Wann bist du fertig?'],
+['warten','beklemek','Können Sie ein paar Minuten warten?'],
+['warum','neden; niçin','Warum kommt er nicht?'],
+['was','ne; neler','Was ist das?'],
+['was für ein','ne tür; nasıl bir','Was für eine Farbe möchten Sie?'],
+['sich waschen','yıkanmak','Wo kann ich mir die Hände waschen?'],
+['das Wasser','su','Ein Glas Wasser, bitte.'],
+['weh tun','ağrımak; acımak','Mein Bein tut weh.'],
+['weiblich','kadın; dişil (cinsiyet)','Kreuzen Sie bitte weiblich an.'],
+['der Wein','şarap','Ich möchte keinen Wein.'],
+['weit','uzak; geniş','Zum Bahnhof ist es nicht weit.'],
+['weiter','devam etmek; ileri','Der Bus fährt nicht weiter.'],
+['welch-','hangi; ne','Welches Buch möchtest du?'],
+['die Welt','dünya','Es gibt viele Probleme auf der Welt.'],
+['wenig','az; pek az','Er verdient wenig.'],
+['wer','kim','Wer ist das?'],
+['werden','olmak; -acak','Mein Sohn will Arzt werden.'],
+['das Wetter','hava durumu','Wir hatten schlechtes Wetter.'],
+['wichtig','önemli; gerekli','Dieses Formular ist sehr wichtig.'],
+['wie','nasıl; ne kadar; gibi','Wie heißt du?'],
+['Wie bitte?','Efendim? / Anlayamadım','Wie bitte? Ich habe das nicht verstanden.'],
+['wiederholen','tekrar etmek','Können Sie das bitte wiederholen?'],
+['das Wiederhören','hoşça kal (telefonda)','Also auf Wiederhören!'],
+['das Wiedersehen','hoşça kal (yüz yüze)','Auf Wiedersehen!'],
+['wie viel','ne kadar; kaç','Wie viel Milch nehmen Sie?'],
+['willkommen','hoş geldiniz','Herzlich willkommen!'],
+['der Wind','rüzgar','Der Wind kommt aus Osten.'],
+['wir','biz','Wir lernen Deutsch.'],
+['wissen','bilmek (bir gerçeği)','Weißt du, wie er heißt?'],
+['wo','nerede','Wo ist die Post?'],
+['woher','nereden','Woher kommen Sie?'],
+['wohin','nereye','Wohin fährt dieser Bus?'],
+['wohnen','oturmak; ikamet etmek','Ich wohne in München.'],
+['die Wohnung','daire; ev; konut','Seit wann haben Sie diese Wohnung?'],
+['wollen','istemek; -mek istemek','Wollen Sie einen Kaffee?'],
+['das Wort','kelime; sözcük','Ich kenne das Wort nicht.'],
+['wunderbar','harika; mükemmel','Das Essen schmeckt wunderbar.'],
+]},
+{id:'z',name:'Z harfi',tag:'zahlen → zwischen',words:[
+['zahlen','ödemek (para)','Zahlen, bitte!'],
+['die Zahl','sayı; rakam','Schreiben Sie die Zahlen aus.'],
+['die Zeit','zaman; vakit','Ich habe heute keine Zeit.'],
+['zurzeit','şu sıralar; şu anda','Zurzeit habe ich sehr viel zu tun.'],
+['die Zeitung','gazete','Ich lese gern Zeitung.'],
+['die Zigarette','sigara','Wie teuer sind die Zigaretten?'],
+['das Zimmer','oda','Das Zimmer ist groß.'],
+['der Zoll','gümrük','Wir müssen noch durch den Zoll.'],
+['zu Fuß gehen','yürüyerek gitmek','Ich gehe zu Fuß.'],
+['der Zucker','şeker','Nehmen Sie Zucker in den Kaffee?'],
+['zuerst','önce; ilk önce','Zuerst gehen wir einkaufen.'],
+['zuhören','dikkatli dinlemek','Bitte hör gut zu!'],
+['zufrieden','memnun; hoşnut','Ich bin mit der Wohnung zufrieden.'],
+['der Zug','tren','Ich fahre gern mit dem Zug.'],
+['zurück','geri; geri dönmek','Wann kommst du zurück?'],
+['zusammen','birlikte; beraber','Sollen wir zusammen essen?'],
+['zwischen','arasında','Heidelberg liegt zwischen Frankfurt und Stuttgart.'],
+]},
+];
+
+// Normalize + build per-deck state
+const ALL_DE = [];
+DECKS.forEach(d=>{
+  d.words = d.words.map(w=>({de:w[0],tr:w[1],ex:w[2]||''}));
+  d.state = d.words.map(()=>({box:1}));
+  d.words.forEach(w=>ALL_DE.push(w.de));
+});
+const TOTAL = DECKS.reduce((s,d)=>s+d.words.length,0);
+
+// ── App state ──
+let curDeck=0, mode='flash', queue=[], qPos=0, sRight=0, sSeen=0;
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+function buildQueue(deck){
+  let arr=[];
+  deck.words.forEach((_,i)=>{
+    const w=6-deck.state[i].box;
+    for(let k=0;k<w;k++)arr.push(i);
+  });
+  return shuffle(arr);
+}
+
+function curIdx(){return queue[qPos%queue.length];}
+function nextCard(){qPos++;if(qPos>=queue.length){queue=buildQueue(DECKS[curDeck]);qPos=0;}}
+
+// ── Render deck grid ──
+function renderDecks(){
+  const g=document.getElementById('deckGrid');
+  g.innerHTML='';
+  DECKS.forEach((d,i)=>{
+    const mastered=d.state.filter(s=>s.box>=4).length;
+    const pct=Math.round(mastered/d.words.length*100);
+    const b=document.createElement('button');
+    b.className='deck-btn'+(i===curDeck?' active':'');
+    b.innerHTML=`<span class="dn">${d.name}</span><span class="dm">${d.words.length} kelime</span><div class="dp"><span style="width:${pct}%"></span></div>`;
+    b.onclick=()=>{curDeck=i;startSession();};
+    g.appendChild(b);
+  });
+}
+
+function renderStat(){
+  document.getElementById('sstat').innerHTML=`Bu oturum: <b>${sSeen}</b> görüldü · <b>${sRight}</b> doğru`;
+}
+
+function renderBoxes(){
+  const d=DECKS[curDeck];
+  const boxes=[0,0,0,0,0];
+  d.state.forEach(s=>boxes[s.box-1]++);
+  const labels=['Kutu 1','Kutu 2','Kutu 3','Kutu 4','Kutu 5'];
+  const bar=document.getElementById('statsbar');
+  bar.innerHTML=boxes.map((n,i)=>`<div class="sbox"><div class="sn">${n}</div><div class="sl">${labels[i]}</div></div>`).join('');
+}
+
+function startSession(){
+  const d=DECKS[curDeck];
+  queue=buildQueue(d); qPos=0; sRight=0; sSeen=0;
+  renderDecks(); renderStat(); renderBoxes();
+  if(mode==='flash')renderFlash();
+  else if(mode==='quiz')renderQuiz();
+  else renderBlank();
+}
+
+// ── FLASH ──
+function renderFlash(){
+  const d=DECKS[curDeck];
+  const idx=curIdx(); const w=d.words[idx]; const box=d.state[idx].box;
+  document.getElementById('stage').innerHTML=`
+    <div class="card-wrap">
+      <div class="fc" id="fc">
+        <div class="face front">
+          <div class="box-badge">Kutu ${box}</div>
+          <div class="etag">Almanca</div>
+          <div class="deword">${w.de}</div>
+          <div class="hint">Kartı çevirmek için tıkla</div>
+        </div>
+        <div class="face back">
+          <div class="box-badge">Kutu ${box}</div>
+          <div class="etag">Türkçe</div>
+          <div class="trword">${w.tr}</div>
+          ${w.ex?`<div class="ex">„${w.ex}"</div>`:''}
+        </div>
+      </div>
+    </div>
+    <div class="ctrl" id="fctl" style="visibility:hidden">
+      <button class="btn btn-no" id="fno">✗ Bilmiyorum</button>
+      <button class="btn btn-yes" id="fyes">✓ Biliyorum</button>
+    </div>
+    <p class="prog">${qPos+1} / ${queue.length}</p>`;
+  const fc=document.getElementById('fc');
+  let flipped=false;
+  fc.onclick=()=>{flipped=!flipped;fc.classList.toggle('flip',flipped);document.getElementById('fctl').style.visibility=flipped?'visible':'hidden';};
+  document.getElementById('fno').onclick=e=>{e.stopPropagation();answerFlash(idx,false);};
+  document.getElementById('fyes').onclick=e=>{e.stopPropagation();answerFlash(idx,true);};
+}
+function answerFlash(idx,knew){
+  const d=DECKS[curDeck]; const st=d.state[idx];
+  sSeen++; if(knew){sRight++;st.box=Math.min(5,st.box+1);}else{st.box=1;}
+  renderStat();renderBoxes();renderDecks();nextCard();renderFlash();
+}
+
+// ── QUIZ ──
+function renderQuiz(){
+  const d=DECKS[curDeck];
+  if(d.words.length<4){document.getElementById('stage').innerHTML='<div class="empty">Test için en az 4 kelime gerekir.</div>';return;}
+  const idx=curIdx(); const w=d.words[idx];
+  let pool=d.words.map((_,i)=>i).filter(i=>i!==idx);
+  shuffle(pool);
+  const dis=pool.slice(0,3).map(i=>d.words[i].tr);
+  const opts=shuffle([w.tr,...dis]);
+  document.getElementById('stage').innerHTML=`
+    <div class="qbox">
+      <div class="qprompt">Türkçesi nedir?</div>
+      <div class="qword">${w.de}</div>
+      <div class="opts" id="qopts"></div>
+      <div class="qnext" id="qnext" style="display:none">
+        <button class="btn btn-next" id="qnextbtn">Sonraki →</button>
+      </div>
+    </div>
+    <p class="prog">${qPos+1} / ${queue.length}</p>`;
+  const optsEl=document.getElementById('qopts');
+  opts.forEach(o=>{
+    const b=document.createElement('button');
+    b.className='opt'; b.textContent=o;
+    b.onclick=()=>answerQuiz(idx,o,w.tr,b,optsEl);
+    optsEl.appendChild(b);
+  });
+}
+function answerQuiz(idx,chosen,correct,btn,optsEl){
+  const d=DECKS[curDeck]; const st=d.state[idx];
+  const knew=chosen===correct; sSeen++;
+  if(knew){sRight++;st.box=Math.min(5,st.box+1);}else{st.box=1;}
+  [...optsEl.children].forEach(b=>{b.disabled=true;if(b.textContent===correct)b.classList.add('ok');else if(b===btn)b.classList.add('err');});
+  document.getElementById('qnext').style.display='block';
+  document.getElementById('qnextbtn').onclick=()=>{nextCard();renderStat();renderBoxes();renderDecks();renderQuiz();};
+  renderStat();renderBoxes();renderDecks();
+}
+
+// ── BLANK ──
+function escRe(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+function makeBlank(sent,de){
+  const root=de.replace(/^(sich\s+|der\s+|die\s+|das\s+|ein\s+|eine\s+|zum\s+|zur\s+)/gi,'').trim().split(/[\s,\/\(\)]/)[0];
+  if(!root||root.length<2)return null;
+  const rx1=new RegExp('\\b'+escRe(root)+'\\b','i');
+  if(rx1.test(sent))return sent.replace(rx1,'<b class="blank-input">___</b>');
+  if(root.length>=4){
+    const rx2=new RegExp('\\b'+escRe(root.slice(0,4))+'\\w*','i');
+    if(rx2.test(sent))return sent.replace(rx2,'<b class="blank-input">___</b>');
+  }
+  return null;
+}
+function renderBlank(){
+  const d=DECKS[curDeck];
+  if(d.words.length<4){document.getElementById('stage').innerHTML='<div class="empty">Boşluk modu için en az 4 kelime gerekir.</div>';return;}
+  const idx=curIdx(); const w=d.words[idx];
+  const blanked=w.ex?makeBlank(w.ex,w.de):null;
+  let pool=d.words.map((_,i)=>i).filter(i=>i!==idx);
+  shuffle(pool);
+  const dis=pool.slice(0,3).map(i=>d.words[i].de);
+  const opts=shuffle([w.de,...dis]);
+  const promptHTML=blanked
+    ?`<div class="bl-tag">Boşluğu doldur</div><div class="bl-tr">${w.tr}</div><div class="bl-sent">${blanked}</div>`
+    :`<div class="bl-tag">Almancası nedir?</div><div class="bl-tr">${w.tr}</div><div class="bl-sent" style="color:var(--ink2);font-size:14px;">Doğru Almanca kelimeyi seç</div>`;
+  document.getElementById('stage').innerHTML=`
+    <div class="blankbox">
+      ${promptHTML}
+      <div class="opts" id="bopts"></div>
+      <div class="qnext" id="bnext" style="display:none">
+        <div id="bfeedback" style="margin-bottom:12px;font-size:14px;"></div>
+        <button class="btn btn-next" id="bnextbtn">Sonraki →</button>
+      </div>
+    </div>
+    <p class="prog">${qPos+1} / ${queue.length}</p>`;
+  const optsEl=document.getElementById('bopts');
+  opts.forEach(o=>{
+    const b=document.createElement('button');
+    b.className='opt'; b.textContent=o;
+    b.onclick=()=>answerBlank(idx,o,w.de,b,optsEl,w.ex,w.tr);
+    optsEl.appendChild(b);
+  });
+}
+function answerBlank(idx,chosen,correct,btn,optsEl,ex,tr){
+  const d=DECKS[curDeck]; const st=d.state[idx];
+  const knew=chosen===correct; sSeen++;
+  if(knew){sRight++;st.box=Math.min(5,st.box+1);}else{st.box=1;}
+  [...optsEl.children].forEach(b=>{b.disabled=true;if(b.textContent===correct)b.classList.add('ok');else if(b===btn)b.classList.add('err');});
+  const fb=document.getElementById('bfeedback');
+  if(fb){
+    fb.innerHTML=knew
+      ?`<span style="color:var(--ok);font-weight:700;">✓ Doğru!</span>${ex?` <em style="color:var(--ink2)">"${ex}"</em>`:''}`
+      :`<span style="color:var(--err);font-weight:700;">✗ Yanlış.</span> Doğrusu: <b>${correct}</b> — ${tr}`;
+  }
+  document.getElementById('bnext').style.display='block';
+  document.getElementById('bnextbtn').onclick=()=>{nextCard();renderStat();renderBoxes();renderDecks();renderBlank();};
+  renderStat();renderBoxes();renderDecks();
+}
+
+// ── TABS ──
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick=()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active'); mode=t.dataset.m;
+    if(mode==='flash')renderFlash();
+    else if(mode==='quiz')renderQuiz();
+    else renderBlank();
+  };
+});
+
+// ── INIT ──
+document.querySelector('h1').textContent=`Kelime Antrenörü — ${TOTAL} Kelime`;
+renderDecks(); startSession();
+</script>
+</body>
+</html>
